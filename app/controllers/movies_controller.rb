@@ -7,7 +7,15 @@ class MoviesController < ApplicationController
   end
 
   def index
+    logger.debug params
     @movies = Movie.all
+    @sortBy = params["sortBy"]
+    if @sortBy == "title"
+      @movies.sort! { |a,b| a.title.downcase <=> b.title.downcase }
+    elsif @sortBy == "releaseDate"
+      @movies.sort! { |a,b| a.release_date <=> b.release_date }
+    end
+    logger.debug @movies
   end
 
   def new
