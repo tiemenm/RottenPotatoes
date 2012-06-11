@@ -7,15 +7,21 @@ class MoviesController < ApplicationController
   end
 
   def index
-    logger.debug params
-    @movies = Movie.all
+    logger.debug params["ratings"]
+    logger.debug request.fullpath
     @sortBy = params["sortBy"]
+    @all_ratings = Movie.all_ratings
+   
+    sort_by_sql = "created_at ASC" 
     if @sortBy == "title"
-      @movies.sort! { |a,b| a.title.downcase <=> b.title.downcase }
+        sort_by_sql = "title ASC"
     elsif @sortBy == "releaseDate"
-      @movies.sort! { |a,b| a.release_date <=> b.release_date }
+        sort_by_sql = "release_date ASC"
     end
-    logger.debug @movies
+    @ratings_filter = params["ratings"]
+    conditions = ["rating IN (?)", params["ratings"].each_key] if params["ratings"]
+    @movies = Movie.find(:all, :conditions => conditions, :order => sort_by_sql)
+    #logger.debug @movies
   end
 
   def new
